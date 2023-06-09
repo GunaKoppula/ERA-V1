@@ -2,7 +2,8 @@
 
 ## Part 1 - Backpropagation
 
-- First, we compute the output of the neural network by propagating the input data through the network's layers. Each layer has a set of weights to the input and passes the result through an activation function and then calculate the loss.
+- Forward propagation
+First, we compute the output of the neural network by propagating the input data through the network's layers. Each layer has a set of weights to the input and passes the result through an activation function and then calculate the loss.
 
 ```ruby
 h1 = w1*i1 + w2*i2		
@@ -18,7 +19,7 @@ E1 = ½ * (t1 - a_o1)²
 E2 = ½ * (t2 - a_o2)²		
 ```
 
-- After calculating loss, we start by calculating the gradient of the loss with respect to the output layers activations.
+- Backward propagation
 
 ```ruby
 ∂E_total/∂w5 = (a_01 - t1) * a_o1 * (1 - a_o1) *  a_h1					
@@ -31,6 +32,8 @@ E2 = ½ * (t2 - a_o2)²
 ∂E_total/∂w3 = ((a_01 - t1) * a_o1 * (1 - a_o1) * w6 +  (a_02 - t2) * a_o2 * (1 - a_o2) * w8) * a_h2 * (1 - a_h2) * i1												
 ∂E_total/∂w4 = ((a_01 - t1) * a_o1 * (1 - a_o1) * w6 +  (a_02 - t2) * a_o2 * (1 - a_o2) * w8) * a_h2 * (1 - a_h2) * i2												
 ```
+
+### Loss curve with change in learning rate
 
 #### learning rate - 0.1
 ![learning_rate_0 1](https://github.com/GunaKoppula/ERA-V1/assets/61241928/296b92fb-fd09-4809-a633-322da07b2b40)
