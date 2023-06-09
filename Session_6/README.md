@@ -3,6 +3,7 @@
 ## Part 1 - Backpropagation
 
 - Forward propagation
+
 First, we compute the output of the neural network by propagating the input data through the network's layers. Each layer has a set of weights to the input and passes the result through an activation function and then calculate the loss.
 
 ```ruby
