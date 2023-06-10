@@ -57,12 +57,13 @@ E2 = ½ * (t2 - a_o2)²
 
 
 
+
 ## Part 2
 
 ## Create and Train a Neural Network in Python
 
 ### Usage
-### S5.ipynb
+### S6.ipynb
 
 - First we have to import all the neccessary libraries.
 
@@ -187,12 +188,10 @@ for epoch in range(0, 20):
 
 I used total 20 epoch
 ```
-Adjusting learning rate of group 0 to 1.0000e-03.
-Epoch 20
-Train: Loss=0.0613 Batch_id=117 Accuracy=99.09: 100%|██████████| 118/118 [03:16<00:00,  1.67s/it]
-Test set: Average loss: 0.0214, Accuracy: 9927/10000 (99.27%)
+EPOCH: 20
+loss=0.007352722343057394 batch_id=468: 100%|██████████| 469/469 [01:15<00:00,  6.23it/s] 
 
-Adjusting learning rate of group 0 to 1.0000e-03.
+Test set: Average loss: 0.0262, Accuracy: 9920/10000 (99.200%)
 ```
 
 
