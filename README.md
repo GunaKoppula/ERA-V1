@@ -1,0 +1,190 @@
+# ERA V1 Session 6
+
+## Part 1 - Backpropagation
+
+- Forward propagation
+
+First, we compute the output of the neural network by propagating the input data through the network's layers. Each layer has a set of weights to the input and passes the result through an activation function and then calculate the loss.
+
+```ruby
+h1 = w1*i1 + w2*i2		
+h2 = w3*i1 + w4*i2		
+a_h1 = σ(h1) = 1/(1 + exp(-h1))		
+a_h2 = σ(h2)		
+o1 = w5*a_h1 + w6*a_h2		
+o2 = w7*a_h1 + w8*a_h2		
+a_o1 = σ(o1)		
+a_o2 = σ(o2)	
+E_total = E1 + E2		
+E1 = ½ * (t1 - a_o1)²		
+E2 = ½ * (t2 - a_o2)²		
+```
+
+- Backward propagation
+
+```ruby
+∂E_total/∂w5 = (a_01 - t1) * a_o1 * (1 - a_o1) *  a_h1					
+∂E_total/∂w6 = (a_01 - t1) * a_o1 * (1 - a_o1) *  a_h2					
+∂E_total/∂w7 = (a_02 - t2) * a_o2 * (1 - a_o2) *  a_h1					
+∂E_total/∂w8 = (a_02 - t2) * a_o2 * (1 - a_o2) *  a_h2					
+
+∂E_total/∂w1 = ((a_01 - t1) * a_o1 * (1 - a_o1) * w5 +  (a_02 - t2) * a_o2 * (1 - a_o2) * w7) * a_h1 * (1 - a_h1) * i1
+∂E_total/∂w2 = ((a_01 - t1) * a_o1 * (1 - a_o1) * w5 +  (a_02 - t2) * a_o2 * (1 - a_o2) * w7) * a_h1 * (1 - a_h1) * i2												
+∂E_total/∂w3 = ((a_01 - t1) * a_o1 * (1 - a_o1) * w6 +  (a_02 - t2) * a_o2 * (1 - a_o2) * w8) * a_h2 * (1 - a_h2) * i1												
+∂E_total/∂w4 = ((a_01 - t1) * a_o1 * (1 - a_o1) * w6 +  (a_02 - t2) * a_o2 * (1 - a_o2) * w8) * a_h2 * (1 - a_h2) * i2												
+```
+
+### Loss curve with change in learning rate
+
+#### learning rate - 0.1
+![learning_rate_0 1](https://github.com/GunaKoppula/ERA-V1/assets/61241928/296b92fb-fd09-4809-a633-322da07b2b40)
+
+#### learning rate - 0.2
+![learning_rate_0 2](https://github.com/GunaKoppula/ERA-V1/assets/61241928/8824eafe-c346-441d-aee5-fff69a93a22a)
+
+#### learning rate - 0.5
+![learning_rate_0 5](https://github.com/GunaKoppula/ERA-V1/assets/61241928/5b41e484-4c76-4b0d-b86e-5b9ff05bd8ed)
+
+#### learning rate - 0.8
+![learning_rate_0 8](https://github.com/GunaKoppula/ERA-V1/assets/61241928/f1f1acc3-e875-432b-bc4b-f2109064db3e)
+
+#### learning rate - 1.0
+![learning_rate_1](https://github.com/GunaKoppula/ERA-V1/assets/61241928/c089962d-6e11-40b8-a557-414460d63375)
+
+#### learning rate - 2.0
+![learning_rate_2](https://github.com/GunaKoppula/ERA-V1/assets/61241928/16772f44-3825-4076-8ac2-20598f267d79)
+
+
+
+
+## Part 2
+
+## Create and Train a Neural Network in Python
+
+### Usage
+### S5.ipynb
+
+- First we have to import all the neccessary libraries.
+
+```ruby
+from __future__ import print_function
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torchvision import datasets, transforms
+```
+- Next we build a simple Neural Network.
+For this, we define a **class Net()** and pass **nn.Module** as the parameter.
+
+```ruby
+class Net(nn.Module):
+```
+
+- Create two functions inside the class to get our model ready. First is the **init()** and the second is the **forward()**.
+- We need to instantiate the class for training the dataset. When we instantiate the class, the forward() function will get executed.
+
+```ruby
+    def __init__(self):
+        super(Net, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, 3, padding=1) #input -? OUtput? RF
+        self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
+        self.pool1 = nn.MaxPool2d(2, 2)
+        self.conv3 = nn.Conv2d(64, 128, 3, padding=1)
+        self.conv4 = nn.Conv2d(128, 256, 3, padding=1)
+        self.pool2 = nn.MaxPool2d(2, 2)
+        self.conv5 = nn.Conv2d(256, 512, 3)
+        self.conv6 = nn.Conv2d(512, 1024, 3)
+        self.conv7 = nn.Conv2d(1024, 10, 3)
+
+    def forward(self, x):
+        x = self.pool1(F.relu(self.conv2(F.relu(self.conv1(x)))))
+        x = self.pool2(F.relu(self.conv4(F.relu(self.conv3(x)))))
+        x = F.relu(self.conv6(F.relu(self.conv5(x))))
+        x = F.relu(self.conv7(x))
+        x = x.view(-1, 10)
+        return F.log_softmax(x)
+ ```
+
+
+- we have to load MNIST dataset then we have to create train and test data
+- 
+```ruby
+from torchvision import datasets
+
+train_data = datasets.MNIST('../data', train=True, download=True, transform=train_transforms)
+test_data = datasets.MNIST('../data', train=False, download=True, transform=test_transforms)
+```
+
+
+- Next we created two functions **train()** and **test()**
+- train() funtion computes the prediction, traininng accuracy and loss
+
+```ruby
+def train(model, device, train_loader, optimizer, epoch):
+    model.train()
+    pbar = tqdm(train_loader)
+    for batch_idx, (data, target) in enumerate(pbar):
+        data, target = data.to(device), target.to(device)
+        optimizer.zero_grad()
+        output = model(data)
+        loss = F.nll_loss(output, target)
+        loss.backward()
+        optimizer.step()
+        pbar.set_description(desc= f'loss={loss.item()} batch_id={batch_idx}')
+```
+
+- And test() function calculates the loss and accuracy of the model
+
+```ruby
+def test(model, device, test_loader):
+    model.eval()
+    test_loss = 0
+    correct = 0
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(device), target.to(device)
+            output = model(data)
+            test_loss += F.nll_loss(output, target, reduction='sum').item()  # sum up batch loss
+            pred = output.argmax(dim=1, keepdim=True)  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+    test_loss /= len(test_loader.dataset)
+
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        test_loss, correct, len(test_loader.dataset),
+        100. * correct / len(test_loader.dataset)))
+```
+
+
+- **Training and Testing trigger**
+-
+```ruby
+model = Net().to(device)
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.1, verbose=True)
+# New Line
+criterion = F.nll_loss
+num_epochs = 20
+
+for epoch in range(1, num_epochs+1):
+  print(f'Epoch {epoch}')
+  utils.train(model, device, train_loader, optimizer, criterion)
+  utils.test(model, device, test_loader, criterion)
+  scheduler.step()
+```
+
+I used total 20 epoch
+```
+Adjusting learning rate of group 0 to 1.0000e-03.
+Epoch 20
+Train: Loss=0.0613 Batch_id=117 Accuracy=99.09: 100%|██████████| 118/118 [03:16<00:00,  1.67s/it]
+Test set: Average loss: 0.0214, Accuracy: 9927/10000 (99.27%)
+
+Adjusting learning rate of group 0 to 1.0000e-03.
+```
+
+
+## Model Summary
+![model_summary](https://github.com/GunaKoppula/Neural-Networks/assets/61241928/185d1d15-ebd8-4888-a9fd-111b751b363f)
+
