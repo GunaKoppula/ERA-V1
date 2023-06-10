@@ -87,34 +87,49 @@ class Net(nn.Module):
 ```ruby
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 3, padding=1) #input -? OUtput? RF
-        self.conv2 = nn.Conv2d(32, 64, 3, padding=1)
+        
+        self.conv1 = nn.Conv2d(1, 8, 3, padding=1)
+        self.batch_1 = nn.BatchNorm2d(8)
+        self.drop_1 = nn.Dropout(0.25)
         self.pool1 = nn.MaxPool2d(2, 2)
-        self.conv3 = nn.Conv2d(64, 128, 3, padding=1)
-        self.conv4 = nn.Conv2d(128, 256, 3, padding=1)
+        
+        self.conv2 = nn.Conv2d(8, 16, 3, padding=1)
+        self.batch_2 = nn.BatchNorm2d(16)
+        self.drop_2 = nn.Dropout(0.25)
         self.pool2 = nn.MaxPool2d(2, 2)
-        self.conv5 = nn.Conv2d(256, 512, 3)
-        self.conv6 = nn.Conv2d(512, 1024, 3)
-        self.conv7 = nn.Conv2d(1024, 10, 3)
+        
+        self.conv3 = nn.Conv2d(16, 16, 3, padding=1)
+        self.batch_3 = nn.BatchNorm2d(16)
+        self.drop_3 = nn.Dropout(0.2)
+        
+        self.conv4 = nn.Conv2d(16,32, 3, padding=1)
+        self.batch_4 = nn.BatchNorm2d(32)
+        self.drop_4 = nn.Dropout(0.2)
+        
+        
+        self.conv5 = nn.Conv2d(32,16,3, padding=1)
+        self.batch_5 = nn.BatchNorm2d(16)
+        self.drop_5 = nn.Dropout(0.2)
+        
+        self.conv6 = nn.Conv2d(16, 10, 1)
+        self.batch_5 = nn.BatchNorm2d(16)
+        self.drop_5 = nn.Dropout(0.2)        
+        
+        self.conv7 = nn.Conv2d(10,10,7)
 
     def forward(self, x):
-        x = self.pool1(F.relu(self.conv2(F.relu(self.conv1(x)))))
-        x = self.pool2(F.relu(self.conv4(F.relu(self.conv3(x)))))
-        x = F.relu(self.conv6(F.relu(self.conv5(x))))
-        x = F.relu(self.conv7(x))
+        x = self.pool1(self.drop_1((F.relu(self.batch_1(self.conv1(x))))))                     
+        x = self.pool2(self.drop_2(F.relu(self.batch_2(self.conv2(x)))))      
+        x = self.drop_3(F.relu(self.batch_3((self.conv3(x)))))        
+        x = self.drop_4(F.relu(self.batch_4((self.conv4(x)))))        
+        x = self.drop_5(F.relu(self.batch_5((self.conv5(x)))))        
+        x = F.relu(self.conv6(x))
+                
+        x = self.conv7(x)
+        
         x = x.view(-1, 10)
         return F.log_softmax(x)
  ```
-
-
-- we have to load MNIST dataset then we have to create train and test data
-- 
-```ruby
-from torchvision import datasets
-
-train_data = datasets.MNIST('../data', train=True, download=True, transform=train_transforms)
-test_data = datasets.MNIST('../data', train=False, download=True, transform=test_transforms)
-```
 
 
 - Next we created two functions **train()** and **test()**
@@ -151,7 +166,7 @@ def test(model, device, test_loader):
 
     test_loss /= len(test_loader.dataset)
 
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.3f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
 ```
@@ -161,17 +176,13 @@ def test(model, device, test_loader):
 -
 ```ruby
 model = Net().to(device)
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.1, verbose=True)
-# New Line
-criterion = F.nll_loss
-num_epochs = 20
+optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
 
-for epoch in range(1, num_epochs+1):
-  print(f'Epoch {epoch}')
-  utils.train(model, device, train_loader, optimizer, criterion)
-  utils.test(model, device, test_loader, criterion)
-  scheduler.step()
+for epoch in range(0, 20):
+    print(f"EPOCH: {epoch+1}")
+    train(model, device, train_loader, optimizer, epoch)
+    test(model, device, test_loader)
 ```
 
 I used total 20 epoch
@@ -186,5 +197,6 @@ Adjusting learning rate of group 0 to 1.0000e-03.
 
 
 ## Model Summary
-![model_summary](https://github.com/GunaKoppula/Neural-Networks/assets/61241928/185d1d15-ebd8-4888-a9fd-111b751b363f)
+![summary](https://github.com/GunaKoppula/ERA-V1-Session-6/assets/61241928/105eaa7c-9dbd-4b3f-9ff4-8e61714deb43)
+
 
